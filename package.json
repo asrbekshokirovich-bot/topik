@@ -1,0 +1,21 @@
+{
+  "name": "topik-station",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TOPIK Station — a Korean language learning platform (monorepo runner).",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "db:up": "docker compose up -d && npm run db:wait",
+    "db:wait": "node scripts/wait-for-db.js",
+    "db:load": "docker compose exec -T db psql -U postgres -d topik_station < backend/schema.sql",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && npm run db:up && npm run db:load",
+    "setup": "npm run install:all && npm run db:up && npm run db:load",
+    "dev": "concurrently -n backend,frontend -c blue,magenta \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "start:backend": "npm run start --prefix backend",
+    "start:frontend": "npm run preview --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
