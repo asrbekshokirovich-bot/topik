@@ -40,6 +40,28 @@ Then open **http://localhost:5173**.
 
 ---
 
+## Run with **Docker only** (no Node.js installed)
+
+If you don't want to install Node.js at all, run the whole stack — database,
+backend, and frontend — inside Docker. You only need **Docker Desktop**.
+
+```bash
+docker compose --profile app up --build
+```
+
+That single command:
+
+- starts PostgreSQL and **auto-loads** `backend/schema.sql` (tables + seed data),
+- builds and runs the backend on **http://localhost:4000**,
+- builds and runs the frontend on **http://localhost:5173**.
+
+Open **http://localhost:5173** and log in with a demo account below.
+
+To stop it: press `Ctrl+C`, then `docker compose --profile app down`.
+To wipe the database and start fresh: `docker compose --profile app down -v`.
+
+---
+
 ## Demo accounts
 
 All demo accounts use the password **`Password123!`**.

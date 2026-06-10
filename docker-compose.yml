@@ -11,11 +11,47 @@ services:
       - "5432:5432"
     volumes:
       - topik_station_data:/var/lib/postgresql/data
+      # Auto-loads the schema + seed data the first time the volume is created.
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d topik_station"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  # ---------------------------------------------------------------------------
+  # The `app` profile runs the whole stack in Docker (no Node.js needed locally).
+  # Start it with:  docker compose --profile app up --build
+  # ---------------------------------------------------------------------------
+  backend:
+    build: ./backend
+    container_name: topik_station_backend
+    profiles: ["app"]
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:postgres@db:5432/topik_station
+      JWT_SECRET: topik_station_dev_secret_5f2c9a7b1e4d8c3a6f0b9d2e7c4a1b8e
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGIN: http://localhost:5173
+      PGSSL: "false"
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: topik_station_frontend
+    profiles: ["app"]
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   topik_station_data:
