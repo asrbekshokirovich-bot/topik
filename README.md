@@ -9,6 +9,24 @@ and practice with an interactive vocabulary quiz.
   access control (STUDENT / TEACHER).
 - **Frontend:** React 18 + Vite + Tailwind CSS + React Router v6.
 - **Database:** PostgreSQL 16 (via Docker Compose, zero config).
+- **AI (Claude):** AI Korean tutor chat, writing correction, quiz generation,
+  and a teacher grading assistant — powered by Claude (Opus 4.8) via the
+  Anthropic API.
+
+## AI features
+
+The AI features use the Anthropic API. They are optional — the rest of the app
+works without them. To enable:
+
+1. Get an API key at <https://console.anthropic.com>.
+2. Put it in `backend/.env`:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...
+   ```
+3. Restart the backend.
+
+Without a key, the AI endpoints return `503` and the UI shows a clear message;
+everything else keeps working.
 
 ---
 
@@ -165,6 +183,11 @@ All `/api/*` routes (except signup/login) require an
 | GET    | `/api/homework/:homeworkId/submissions`    | TEACHER | List submissions for an assignment       |
 | GET    | `/api/submissions/mine`                    | STUDENT | The student's grades across all classes  |
 | PUT    | `/api/submissions/:id/grade`               | TEACHER | Grade a submission                       |
+| GET    | `/api/ai/status`                           | any     | Whether AI features are enabled          |
+| POST   | `/api/ai/tutor`                            | any     | AI Korean tutor chat                     |
+| POST   | `/api/ai/correct`                          | any     | AI writing correction                    |
+| POST   | `/api/ai/quiz`                             | any     | AI-generated TOPIK vocabulary quiz       |
+| POST   | `/api/ai/grade-suggestion`                 | TEACHER | AI suggested grade + feedback            |
 | GET    | `/health`                                  | public  | Health check                             |
 
 ---
