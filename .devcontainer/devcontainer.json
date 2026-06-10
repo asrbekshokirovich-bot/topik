@@ -1,0 +1,13 @@
+{
+  "name": "TOPIK Station",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [4000, 5173],
+  "portsAttributes": {
+    "5173": { "label": "Frontend", "onAutoForward": "openPreview" },
+    "4000": { "label": "Backend API", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "npm run install:all"
+}

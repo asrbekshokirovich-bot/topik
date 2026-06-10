@@ -1,7 +1,8 @@
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(
-  /\/$/,
-  ''
-);
+// Base URL for API requests. Empty by default → relative same-origin paths
+// (e.g. "/api/auth/login"), which the Vite dev server proxies to the backend.
+// This works on localhost, in Docker, and behind Codespaces forwarded URLs
+// without any CORS setup. Set VITE_API_URL to call a backend on another origin.
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 const TOKEN_KEY = 'topik_token';
 

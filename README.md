@@ -40,6 +40,26 @@ Then open **http://localhost:5173**.
 
 ---
 
+## Run in the browser with **GitHub Codespaces** (nothing installed)
+
+No local install at all — runs entirely in your browser. Good when you can't
+install Node.js or Docker (e.g. an older or locked-down Windows).
+
+1. Open the repo on GitHub and select this branch.
+2. Click the green **Code** button → **Codespaces** tab → **Create codespace**.
+3. Wait for the browser editor to load (dependencies install automatically).
+4. In the terminal, run:
+   ```bash
+   npm run setup     # starts Postgres (Docker is preinstalled in Codespaces) + loads data
+   npm run dev       # backend + frontend
+   ```
+5. When the **port 5173** notification appears, click **Open in Browser**.
+
+The frontend talks to the backend through a same-origin proxy, so it works on
+the Codespaces forwarded URL with no extra configuration.
+
+---
+
 ## Run with **Docker only** (no Node.js installed)
 
 If you don't want to install Node.js at all, run the whole stack — database,
