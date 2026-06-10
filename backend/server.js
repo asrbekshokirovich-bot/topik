@@ -6,12 +6,14 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const Anthropic = require('@anthropic-ai/sdk');
 
 const authRoutes = require('./routes/authRoutes');
 const classRoutes = require('./routes/classRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const homeworkRoutes = require('./routes/homeworkRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 
@@ -51,6 +53,7 @@ app.use('/api/classes', classRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/homework', homeworkRoutes);
 app.use('/api/submissions', submissionRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 handler.
 app.use((req, res) => {
@@ -70,6 +73,21 @@ app.use((err, req, res, next) => {
     return res
       .status(400)
       .json({ error: 'Referenced record does not exist.' });
+  }
+
+  // AI features not configured (no ANTHROPIC_API_KEY).
+  if (err && err.code === 'AI_NOT_CONFIGURED') {
+    return res.status(503).json({ error: err.message });
+  }
+
+  // Errors from the Anthropic API (rate limits, auth, overload, etc.).
+  if (err instanceof Anthropic.APIError) {
+    const aiStatus = typeof err.status === 'number' ? err.status : 502;
+    // eslint-disable-next-line no-console
+    console.error('Anthropic API error:', err.status, err.message);
+    return res.status(aiStatus >= 400 && aiStatus < 600 ? aiStatus : 502).json({
+      error: 'The AI service returned an error. Please try again in a moment.',
+    });
   }
 
   // eslint-disable-next-line no-console

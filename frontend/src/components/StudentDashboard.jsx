@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import VocabularyQuiz from './VocabularyQuiz.jsx';
+import AITutor from './AITutor.jsx';
+import WritingCorrector from './WritingCorrector.jsx';
 
 function formatDateTime(value) {
   if (!value) return '';
@@ -100,6 +102,17 @@ export default function StudentDashboard() {
 
         {/* Grades */}
         <GradesPanel key={gradesKey} />
+
+        {/* AI study tools */}
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            AI Study Tools
+          </h2>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <AITutor />
+            <WritingCorrector />
+          </div>
+        </section>
 
         {/* Vocabulary quiz */}
         <section>

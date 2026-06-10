@@ -759,6 +759,25 @@ function SubmissionRow({ submission, maxScore, onGraded }) {
   const [feedback, setFeedback] = useState(submission.feedback || '');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
+
+  async function suggest() {
+    setError('');
+    setAiLoading(true);
+    try {
+      const { suggestion: s } = await api.post('/api/ai/grade-suggestion', {
+        submissionId: submission.id,
+      });
+      setSuggestion(s);
+      setScore(String(s.score));
+      if (s.feedback) setFeedback(s.feedback);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   async function grade(e) {
     e.preventDefault();
@@ -850,8 +869,52 @@ function SubmissionRow({ submission, maxScore, onGraded }) {
         >
           {saving ? 'Saving…' : 'Save grade'}
         </button>
+        <button
+          type="button"
+          onClick={suggest}
+          disabled={aiLoading}
+          className="rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 disabled:opacity-60"
+          title="Suggest a grade and feedback with AI"
+        >
+          {aiLoading ? 'Thinking…' : '✨ AI suggest'}
+        </button>
       </form>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+
+      {suggestion && (
+        <div className="mt-3 rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
+          <p className="font-semibold text-indigo-800">
+            AI suggestion: {suggestion.score}/{suggestion.maxScore}
+          </p>
+          {suggestion.strengths?.length > 0 && (
+            <div className="mt-1">
+              <span className="text-xs font-semibold uppercase tracking-wide text-green-600">
+                Strengths
+              </span>
+              <ul className="ml-4 list-disc text-slate-600">
+                {suggestion.strengths.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {suggestion.improvements?.length > 0 && (
+            <div className="mt-1">
+              <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
+                To improve
+              </span>
+              <ul className="ml-4 list-disc text-slate-600">
+                {suggestion.improvements.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <p className="mt-2 text-xs text-slate-400">
+            Review and edit before saving — this is only a suggestion.
+          </p>
+        </div>
+      )}
     </li>
   );
 }
